@@ -343,6 +343,9 @@ var
   end;
 
   procedure DrawUp(ACanvas: TCanvas; AMouseOver: Boolean);
+  var
+    TextRect: TRect;
+    TextHeight, VerticalOffset: Integer;
   begin
     {$IFDEF JVCLThemesEnabled}
     if Themed and StyleServices.Enabled then
@@ -357,28 +360,54 @@ var
       DrawBackground(ACanvas, BackColor);
       Frame3D(ACanvas, R, clBtnHighlight, clBlack, 1);
     end;
+
     if Cap <> '' then
-      DrawText(ACanvas, Cap, -1, R, DT_CENTER or DT_VCENTER or DT_SINGLELINE);
+    begin
+      TextRect := Rect(0, 0, R.Width, 0);
+      DrawText(ACanvas.Handle, PChar(Cap), -1, TextRect, DT_LEFT or DT_WORDBREAK or DT_CALCRECT);
+      TextHeight := TextRect.Height;
+
+      VerticalOffset := (R.Height - TextHeight) div 2;
+
+      TextRect := Rect(R.Left, R.Top + VerticalOffset, R.Right, R.Bottom);
+
+      DrawText(ACanvas.Handle, PChar(Cap), -1, TextRect, DT_CENTER or DT_VCENTER or DT_WORDBREAK);
+    end;
   end;
 
   procedure DrawDown(ACanvas: TCanvas; AMouseOver: Boolean);
+  var
+    TextRect: TRect;
+    TextHeight, VerticalOffset: Integer;
   begin
     {$IFDEF JVCLThemesEnabled}
     if Themed and StyleServices.Enabled then
     begin
       DrawThemedBkgrnd(ACanvas, R);
-      R := DrawThemedButtonFace(Self, ACanvas, R, 0, bsAutoDetect, False, True, False, AMouseOver);
+      R := DrawThemedButtonFace(Self, ACanvas, R, 0, bsAutoDetect, False, True, True, AMouseOver);
       SetBkMode(ACanvas.Handle, Windows.TRANSPARENT);
     end
     else
     {$ENDIF JVCLThemesEnabled}
     begin
       DrawBackground(ACanvas, BackColor);
-      Frame3D(ACanvas, R, clBlack, clBtnHighlight, 1);
+      Frame3D(ACanvas, R, clBtnHighlight, clBlack, 1);
     end;
+
     if Cap <> '' then
-      DrawText(ACanvas, Cap, -1, R, DT_CENTER or DT_VCENTER or DT_SINGLELINE);
+    begin
+      TextRect := Rect(0, 0, R.Width, 0);
+      DrawText(ACanvas.Handle, PChar(Cap), -1, TextRect, DT_LEFT or DT_WORDBREAK or DT_CALCRECT);
+      TextHeight := TextRect.Height;
+
+      VerticalOffset := (R.Height - TextHeight) div 2;
+
+      TextRect := Rect(R.Left + 1, R.Top + 1 + VerticalOffset, R.Right + 1, R.Bottom + 1);
+
+      DrawText(ACanvas.Handle, PChar(Cap), -1, TextRect, DT_CENTER or DT_VCENTER or DT_WORDBREAK);
+    end;
   end;
+
 
 var
   Col, Row: Integer;
